@@ -2510,6 +2510,19 @@ struct GTY(()) machine_frame_state
 /* Private to winnt.c.  */
 struct seh_frame_state;
 
+enum function_type
+   {
+      TYPE_UNKNOWN = 0,
+      TYPE_NORMAL,
+      /* The current function is an interrupt service routine with a
+	 pointer argument as specified by the "interrupt" attribute.  */
+      TYPE_INTERRUPT,
+      /* The current function is an interrupt service routine with a
+     pointer argument and an integer argument as specified by the
+     "interrupt" attribute.  */
+  TYPE_EXCEPTION
+   };
+
 struct GTY(()) machine_function {
   struct stack_local_entry *stack_locals;
   const char *some_ld_name;
@@ -2566,6 +2579,20 @@ struct GTY(()) machine_function {
 
   /* If true, it is safe to not save/restore DRAP register.  */
   BOOL_BITFIELD no_drap_save_restore : 1;
+
+  /* Function type.  */
+  ENUM_BITFIELD(function_type) func_type : 2;
+
+  /* How to generate indirec branch.  */
+  ENUM_BITFIELD(indirect_branch) indirect_branch_type : 3;
+
+  /* If true, the current function has local indirect jumps, like
+     "indirect_jump" or "tablejump".  */
+  BOOL_BITFIELD has_local_indirect_jump : 1;
+
+  /* If true, the current function is a function specified with
+     the "interrupt" or "no_caller_saved_registers" attribute.  */
+  BOOL_BITFIELD no_caller_saved_registers : 1;
 
   /* If true, there is register available for argument passing.  This
      is used only in ix86_function_ok_for_sibcall by 32-bit to determine

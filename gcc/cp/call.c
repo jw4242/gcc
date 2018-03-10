@@ -1834,6 +1834,9 @@ implicit_conversion (tree to, tree from, tree expr, bool c_cast_p,
       from = TREE_TYPE (expr);
     }
 
+  if (!from)
+    return NULL;
+
   if (TREE_CODE (to) == REFERENCE_TYPE)
     conv = reference_binding (to, from, expr, c_cast_p, flags, complain);
   else
@@ -10572,6 +10575,13 @@ perform_implicit_conversion_flags (tree type, tree expr,
 	     Call instantiate_type to get good error messages.  */
 	  if (TREE_TYPE (expr) == unknown_type_node)
 	    instantiate_type (type, expr, complain);
+	  /* We may find this if we parse a default argument as part
+	     of a bogus implicit template function declaration.  It
+	     might be a template-dependent expression, or a call of an
+	     undeclared function.  */
+	  else if (!TREE_TYPE (expr))
+	    error_at (loc, "cannot convert typeless expression %qE",
+		      expr);
 	  else if (invalid_nonstatic_memfn_p (loc, expr, complain))
 	    /* We gave an error.  */;
 	  else

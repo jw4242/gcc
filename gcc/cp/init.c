@@ -4405,8 +4405,14 @@ build_vec_init (tree base, tree maxindex, tree init,
 	  else
 	    {
 	      if (TREE_CODE (init) == TREE_LIST)
-		init = build_x_compound_expr_from_list (init, ELK_INIT,
-							complain);
+		{
+		  init = build_x_compound_expr_from_list (init, ELK_INIT,
+							  complain);
+		  init
+		    = convert_for_initialization (NULL_TREE, type, init,
+						  LOOKUP_IMPLICIT, ICR_INIT,
+						  NULL_TREE, 0, complain);
+		}
 	      elt_init = (init == error_mark_node
 			  ? error_mark_node
 			  : build2 (INIT_EXPR, type, to, init));
